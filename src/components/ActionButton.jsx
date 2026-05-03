@@ -1,8 +1,8 @@
 import React from 'react';
 
-function ActionButton({ children, onClick }) {
+function ActionButton({ children, disabled, onClick }) {
   return (
-    <button className="action-button" type="button" onClick={onClick}>
+    <button className="action-button" type="button" disabled={disabled} onClick={onClick}>
       {children}
     </button>
   );

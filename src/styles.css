@@ -89,6 +89,11 @@ textarea:focus {
   background: #174741;
 }
 
+.action-button:disabled {
+  background: #8aa09a;
+  cursor: not-allowed;
+}
+
 .result-section {
   margin-top: 18px;
   padding: 18px;

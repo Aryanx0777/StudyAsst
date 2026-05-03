@@ -7,15 +7,21 @@ function Home() {
   const [notes, setNotes] = useState('');
   const [summary, setSummary] = useState('');
   const [quiz, setQuiz] = useState([]);
+  const [isSummarizing, setIsSummarizing] = useState(false);
+  const [isGeneratingQuiz, setIsGeneratingQuiz] = useState(false);
 
-  const handleSummarize = () => {
-    const result = summarizeText(notes);
-    setSummary(result);
+  const handleSummarize = async () => {
+    setIsSummarizing(true);
+    const result = await summarizeText(notes);
+    setSummary(result.summary);
+    setIsSummarizing(false);
   };
 
-  const handleGenerateQuiz = () => {
-    const result = generateQuiz(notes);
+  const handleGenerateQuiz = async () => {
+    setIsGeneratingQuiz(true);
+    const result = await generateQuiz(notes);
     setQuiz(result);
+    setIsGeneratingQuiz(false);
   };
 
   return (
@@ -38,8 +44,12 @@ function Home() {
         />
 
         <div className="actions">
-          <ActionButton onClick={handleSummarize}>Summarize</ActionButton>
-          <ActionButton onClick={handleGenerateQuiz}>Generate Quiz</ActionButton>
+          <ActionButton disabled={isSummarizing} onClick={handleSummarize}>
+            {isSummarizing ? 'Summarizing...' : 'Summarize'}
+          </ActionButton>
+          <ActionButton disabled={isGeneratingQuiz} onClick={handleGenerateQuiz}>
+            {isGeneratingQuiz ? 'Generating...' : 'Generate Quiz'}
+          </ActionButton>
         </div>
 
         <ResultSection title="Summary">
@@ -49,8 +59,15 @@ function Home() {
         <ResultSection title="Quiz Questions">
           {quiz.length > 0 ? (
             <ol className="quiz-list">
-              {quiz.map((question) => (
-                <li key={question}>{question}</li>
+              {quiz.map((q, index) => (
+                <li key={index}>
+                  <p>{q.question}</p>
+                  <ul>
+                    {q.options.map((opt, i) => (
+                      <li key={i}>{opt}</li>
+                    ))}
+                  </ul>
+                </li>
               ))}
             </ol>
           ) : (
