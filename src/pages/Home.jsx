@@ -8,6 +8,8 @@ function Home() {
   const [summary, setSummary] = useState('');
   const [quiz, setQuiz] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [answers, setAnswers] = useState({});
+  const [checked, setChecked] = useState(false);
 
   const handleSummarize = async () => {
     if (!text.trim()) {
@@ -30,6 +32,8 @@ function Home() {
     setLoading(true);
     const result = await generateQuiz(text);
     setQuiz(result);
+    setAnswers({});
+    setChecked(false);
     setLoading(false);
   };
 
@@ -86,16 +90,49 @@ function Home() {
           >
             <div>
               {quiz.length > 0 ? (
-                quiz.map((q, index) => (
-                  <div key={index}>
-                    <p><strong>{q.question}</strong></p>
-                    <ul>
-                      {q.options.map((opt, i) => (
-                        <li key={i}>{opt}</li>
-                      ))}
-                    </ul>
-                  </div>
-                ))
+                <>
+                  {quiz.map((q, index) => (
+                    <div key={index} style={{ marginBottom: '15px' }}>
+                      <p><strong>{q.question}</strong></p>
+                      {q.options.map((opt, i) => {
+                        const isSelected = answers[index] === opt;
+                        const isCorrect = q.answer === opt;
+
+                        let style = {};
+
+                        if (checked) {
+                          if (isSelected && isCorrect) {
+                            style = { color: 'green', fontWeight: 'bold' };
+                          } else if (isSelected && !isCorrect) {
+                            style = { color: 'red' };
+                          } else if (isCorrect) {
+                            style = { color: 'green' };
+                          }
+                        }
+
+                        return (
+                          <label key={i} style={{ display: 'block', ...style }}>
+                            <input
+                              type="radio"
+                              name={`q-${index}`}
+                              value={opt}
+                              onChange={() =>
+                                setAnswers((prev) => ({
+                                  ...prev,
+                                  [index]: opt
+                                }))
+                              }
+                            />
+                            {opt}
+                          </label>
+                        );
+                      })}
+                    </div>
+                  ))}
+                  <button onClick={() => setChecked(true)}>
+                    Check Answers
+                  </button>
+                </>
               ) : (
                 <p>Generated quiz questions will appear here.</p>
               )}
